@@ -310,8 +310,8 @@ double tp = 253; //day of parturition
 double Tg = 150; //gestation period
 double tc = tp - Tg; //day conception
 double Tl = tp - 4*7; //from here on if infected goes to IP2
-double ta = tp - 25; //average day of abortion
-
+//double ta = tp - 25; //average day of abortion
+double Ta = 50;
 /// --------------------------------------------------------------------------
 
 /// define forcing function Qp(t) 
@@ -358,20 +358,20 @@ double Qc(double t) {
 /// --------------------------------------------------------------------------
 /// define forcing function Qa(t)
 
-double HF3 (double x) {
-  double out = exp(dglogis(x, ta, 6.645, 1.068, TRUE) - pglogis(x, ta, 6.645, 1.068, FALSE, TRUE)); //guarda que F and T estan dados vuelta con respecto a la version en R
-  return out;
-}
+// double HF3 (double x) {
+//  double out = exp(dglogis(x, ta, 6.645, 1.068, TRUE) - pglogis(x, ta, 6.645, 1.068, FALSE, TRUE)); //guarda que F and T estan dados vuelta con respecto a la version en R
+// return out;
+// }
 
-double Qa(double t) {
-  double out;
-  if (modulus(t,365,1) < (ta-(11.44*3)) || modulus(t,365,1) > (ta+(11.44*3))){
-    out = 0;
-  } else {
-    out = HF3(modulus(t,365,1));
-  }
-  return out;
-}
+//double Qa(double t) {
+//  double out;
+// if (modulus(t,365,1) < (ta-(11.44*3)) || modulus(t,365,1) > (ta+(11.44*3))){
+//    out = 0;
+//  } else {
+//    out = HF3(modulus(t,365,1));
+//  }
+//  return out;
+//}
 
 /// --------------------------------------------------------------------------
 /// define forcing function Qin(t) 
@@ -415,7 +415,28 @@ Rcpp::List CaneGillespie(double t_start, double t_end, std::vector<double> n_ini
     A=n_init[13], K=n_init[14], KI=n_init[15], i=0;
   
   int N=SNP+SP+INP1+INP2+INP3+INP4+IP+IP2+JNP+JP+RNP+RP; //total pop size
-  
+
+// ff for abortions need as arguments params  
+  double QaI(double t) {
+   double out;
+    if (modulus(t,365,1) < (tp-Ta) || modulus(t,365,1) > (tp-Ta)){
+      out = 0;
+   } else {
+    out = -log(1-par[2])/Ta;
+    }
+    return out;
+  }
+
+  double QaJ(double t) {
+    double out;
+      if (modulus(t,365,1) < (tp-Ta) || modulus(t,365,1) > (tp-Ta)){
+      out = 0;
+  } else {
+    out = -log(1-par[3])/Ta;
+  }
+  return out;
+  }
+
 // vectors to store outputs
 //  NumericVector t_vec, E_vec;
   std::vector<double> t_vec, E_vec;
@@ -484,9 +505,9 @@ Rcpp::List CaneGillespie(double t_start, double t_end, std::vector<double> n_ini
     rates[27] = gamma*INP3;
     rates[28] = (1-p)*gamma*INP4;
     rates[29] =  p*gamma*INP4;
-    rates[30] = alpha*fI*IP*Qa(t);
-    rates[31] =  (1-alpha)*fI*IP*Qa(t);
-    rates[32] = fJ*JP*Qa(t);
+    rates[30] = alpha*fI*IP*QaI(t);
+    rates[31] =  (1-alpha)*fI*IP*QaI(t);
+    rates[32] = fJ*JP*QaJ(t);
     
     for (i = 0; i < 33; i++) {
       if(rates[i]<0){rates[i] = 0;}
