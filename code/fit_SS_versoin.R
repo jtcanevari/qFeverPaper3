@@ -1,0 +1,1 @@
+#Objetivo de este script: 1. correr el modelo de los Dutch 100 veces y obtener numero de abortos cuando estabiliza. 2. correr modelo SS_version variando el valor de Beta (unicamente) y conservando los valores de Beta que te dan un numero similar de abortos cuando estabiliza. Para esto vale la pena tener el modelo en Rcpp.
