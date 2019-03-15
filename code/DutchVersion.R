@@ -20,7 +20,8 @@ tp <- 253 #day of parturition
 Tg <- 150
 tc <- tp - Tg #day conception
 Tl <- tp- 4*7 #from here on if infected move to IP2
-ta <- tp - 25 # average day of abortion
+# ta <- tp - 25 # average day of abortion
+ta <- 50 # day abortions start
 
 #create hazard functions for a logistic dist fitted to Autumn 2015 kiddings.
 HF <- function(x) {
@@ -31,16 +32,16 @@ HF2 <- function(x) {
   exp(dglogis(x, location = tc, scale = 4.987, shape = 1.125, log = TRUE) - pglogis(x, location = tc, scale = 4.987, shape = 1.125, log = TRUE, lower=FALSE))
 }
 
-HF3 <- function(x) {
-  exp(dglogis(x, location = ta, scale = 6.645, shape = 1.068, log = TRUE) - pglogis(x, location = ta, scale = 6.645, shape = 1.068, log = TRUE, lower=FALSE))
-}
+# HF3 <- function(x) {
+#   exp(dglogis(x, location = ta, scale = 6.645, shape = 1.068, log = TRUE) - pglogis(x, location = ta, scale = 6.645, shape = 1.068, log = TRUE, lower=FALSE))
+# }
 
 Qp <- function(t) {ifelse(mod(t,365,1) > (tp+40) | mod(t,365,1) < (tp-30) ,0,HF(mod(t,365,1)))}
 Qc <- function(t) {ifelse(mod(t,365,1) > (tc+40) | mod(t,365,1) < (tc-30),0,HF2(mod(t,365,1)))}
 Qin <- function(t) {ifelse(mod(t,365,1)<tp+60|mod(t,365,1)>tp+90,0,0.214)}
 Q4 <- function(t) {ifelse(mod(t,365,1)>Tl & mod(t,365,1)<tp+40,0,1)}
-Qa <- function(t) {ifelse(mod(t,365,1) < (ta-(11.44*3)) | mod(t,365,1) > (ta+(11.44*3)),0,HF3(mod(t,365,1)))} #sd=11.44
-
+QaI <- function(t) {ifelse(mod(t,365,1) < tp-ta | mod(t,365,1) > tp-ta, 0, -log(1-0.75)/ta)}
+QaJ <- function(t) {ifelse(mod(t,365,1) < tp-ta | mod(t,365,1) > tp-ta, 0, -log(1-0.25)/ta)}
 #------------------------------------------------------------#
 # Gillespie
 #------------------------------------------------------------#
@@ -100,9 +101,9 @@ SIR.onestep <- function (x, params) { #function to calculate one step of stochas
                  gamma*INP3,
                  (1-p)*gamma*INP4,                #recoveries
                  p*gamma*INP4,
-                 alpha*fI*IP*Qa(t),   #abortions
-                 (1-alpha)*fI*IP*Qa(t),
-                 fJ*JP*Qa(t)         #DEJA JP Y VA A RNP
+                 alpha*fI*IP*QaI(t),   #abortions
+                 (1-alpha)*fI*IP*QaI(t),
+                 fJ*JP*QaJ(t)         #DEJA JP Y VA A RNP
       )
       rates <- ifelse(rates > 0, rates, exp(-10))     #otherwise negative rates sometimes
       

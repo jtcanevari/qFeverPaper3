@@ -324,7 +324,6 @@ double HF_cpp(double x)
 }
 
 //select value for HF depending on the value of t
-// [[Rcpp::export]]
 double Qp(double t) 
 {
   double out;    
@@ -346,7 +345,6 @@ double HF2_cpp(double x) {
 }
 
 //select value depending on t
-// [[Rcpp::export]]
 double Qc(double t) {
   double out;    
   if (modulus(t,365,1) > (tc+40) || modulus(t,365,1) < (tc-30)) {
@@ -365,7 +363,6 @@ double HF3 (double x) {
   return out;
 }
 
-// [[Rcpp::export]]
 double Qa(double t) {
   double out;
   if (modulus(t,365,1) < (ta-(11.44*3)) || modulus(t,365,1) > (ta+(11.44*3))){
@@ -378,7 +375,6 @@ double Qa(double t) {
 
 /// --------------------------------------------------------------------------
 /// define forcing function Qin(t) 
-// [[Rcpp::export]]
 double Qin (double t) {
   double out;
   if (modulus(t,365,1) < tp+60 || modulus(t,365,1) > tp+90) {
@@ -391,7 +387,6 @@ double Qin (double t) {
 
 /// --------------------------------------------------------------------------
 /// define forcing function Q4(t) 
-// [[Rcpp::export]]
 double Q4 (double t) {
   double out;
   if ((modulus(t,365,1) > Tl) and (modulus(t,365,1) < tp + 40)){
@@ -527,8 +522,8 @@ Rcpp::List CaneGillespie(double t_start, double t_end, std::vector<double> n_ini
         case 8: SP--; SNP++; K++; break;
         case 9: IP--; RNP++; K++; KI++; E += epsilon_p; break;
         case 10: IP--; JNP++; K++; KI++; E += epsilon_p; break;
-        case 11: IP2--; RNP++; K++; E += epsilon_p; break;
-        case 12: IP2--; JNP++; K++; E += epsilon_p; break;
+        case 11: IP2--; RNP++; K++; KI++; E += epsilon_p; break;
+        case 12: IP2--; JNP++; K++; KI++; E += epsilon_p; break;
         case 13: JP--; RNP++; K++; KI++; E += epsilon_p; break;
         case 14: RP--; RNP++; K++; break;
         case 15: SNP--; Y++; break;

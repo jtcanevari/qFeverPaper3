@@ -7,11 +7,10 @@ library(lubridate); library(dplyr); library(ggplot2)
 dat <- data.frame(modelOut[[1]])
 dat$iteration=1
 
-for(i in 2:nsims){
-  tdat <- data.frame(modelOut[[i]])
-  tdat$iteration=i
-  dat <- rbind(dat,tdat)
-}
+for(i in 1:nsims){
+  modelOut[[i]] <- do.call(data.frame, modelOut[[i]])
+  modelOut[[i]]$iter <- i}
+dat <- do.call(rbind, modelOut)
 
 #flag kidding event with a 1
 dat <- dat %>% group_by(iteration) %>% mutate(kevent = ave(K, FUN=function(x) c(0, diff(x))))
@@ -43,19 +42,19 @@ tdat$abortion.risk<- round(tdat$abortions / (tdat$abortions + tdat$total.kid),3)
 tdat <- subset(tdat, !year==max(year))
 
 #plot shedding by farm and year as dot plot.
-windows();plot(tdat$incidence ~ tdat$year,ylim = c(0,0.2),col='red', ylab='Prevalence', xlab='Time')
+# windows();plot(tdat$incidence ~ tdat$year,ylim = c(0,0.2),col='red', ylab='Prevalence', xlab='Time')
 
-setwd('C:\\Users\\jcanevari\\Dropbox\\qFeverPaper3\\docs')
+# setwd('C:\\Users\\jcanevari\\Documents\\Projects\\PhD\\qFeverPaper3\\docs')
 
-# pdf('Dutch.pdf')
+pdf('outputDutchV03.pdf')
 ggplot()+
   geom_point(aes(x=year,y=incidence, colour=factor(iteration)),data=tdat)+
   geom_line(aes(x=year,y=incidence, colour = factor(iteration)),data=tdat)+
   scale_x_continuous(breaks=2014:2028, labels = 1:15)+
   theme(legend.position = "none")+
   labs(title = "Inicidence of shedding does at kidding",
-       subtitle = "Dutch version 30 iterations 15 years",
-       caption = "Paper 3 project",
+       subtitle = "Dutch version 100 iterations 15 years",
+       caption = "alhpa = 0.2, beta = 5, rest = Dutch",
        x = "year", y = "incidence")
 
 
@@ -65,10 +64,10 @@ ggplot()+
   scale_x_continuous(breaks=2014:2028, labels = 1:15)+
   theme(legend.position = "none")+
   labs(title = "Abortion risk over time",
-       subtitle = "Dutch version 30 iterations 15 years",
-       caption = "Paper 3 project",
+       subtitle = "Dutch version 100 iterations 15 years",
+       caption = "alhpa = 0.2, beta = 2.5, rest = Dutch",
        x = "year", y = "risk")
-# dev.off()
+dev.off()
 
 #donde termina una epidemia?
 tdat$active.kinf <- ifelse(tdat$inf.kid>0,1,0)
