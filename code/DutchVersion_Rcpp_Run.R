@@ -6,7 +6,7 @@ library("Rcpp")
 
 #-----------------------------------------------------------
 # source the model
-Rcpp::sourceCpp("C:\\Users\\jcanevari\\Documents\\Projects\\PhD\\qFeverPaper3\\code\\DutchVersion2.cpp")
+Rcpp::sourceCpp("C:\\Users\\jcanevari\\Documents\\Projects\\PhD\\qFeverPaper3\\code\\DutchVersion.cpp")
 # Rcpp::sourceCpp("C:\\Temp\\DutchVersion.cpp")
 
 #-----------------------------------------------------------
@@ -18,8 +18,8 @@ xstart <- c(SNP = 425, SP = 424, INP1 = 0, INP2 = 0, INP3 = 0, INP4 = 0, IP = 1,
 # params <- c(muE = 1/20, beta = 1, gamma = 4/14.4, epsilon_p = 1, epsilon_f = 10^(-6)*1000/365, 
             # phi = 0.95, mu = (1+(22/30)*0.95)/(3.1*365), alpha =0.7, fI = 0.75, fJ = 0.25, p = 0.5)
 
-params <- c(phi = 0.95, mu = (1+(22/30)*0.7)/(3.1*365), fI = 0.75, fJ = 0.25, gamma = 4/14.4,
-            alpha = 0.2, beta = 2, p = 0.5, epsilon.p = 1, epsilon.f = 10^(-6)*1000/365, muE = 1/20)
+params <- c(phi = 0.95, mu = (1+(22/30)*0.7)/(3.1*365), fI = 0.8, fJ = 0.25, gamma = 4/150,
+            alpha = 0.2, beta = 2.5, p = 0.5, epsilon.p = 1, epsilon.f = 20^(-2)/365, muE = 1/20)
 #-----------------------------------------------------------
 # run and store
 nsims = 50

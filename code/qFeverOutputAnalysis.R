@@ -1,7 +1,8 @@
 #------------------------------------------------------------#
 # Q fever output analysis
 #------------------------------------------------------------#
-library(lubridate); library(dplyr); library(ggplot2)
+library(lubridate); library(dplyr); library(ggplot2); library(scales)
+
 
 #unlist simulations
 for(i in 1:nsims){
@@ -11,7 +12,7 @@ dat <- do.call(rbind, modelOut)
 
 #flag kidding event with a 1
 dat <- dat %>% group_by(iter) %>% mutate(kevent = ave(K, FUN=function(x) c(0, diff(x))))
-#falg kidding of an infected doe with a 1
+#flag kidding of an infected doe with a 1
 dat <- dat %>% group_by(iter) %>% mutate(kinf.event=ave(KI, FUN=function(x) c(0, diff(x))))
 #flag abortions
 dat <- dat %>% group_by(iter) %>% mutate(abort = ave(A, FUN=function(x) c(0, diff(x))))
@@ -64,7 +65,7 @@ ggplot()+
        subtitle = "Dutch version 100 iters 15 years",
        caption = paste("alhpa = ", params[6], "beta = ", params[7]),
        x = "year", y = "risk")
-dev.off()
+# dev.off()
 
 #donde termina una epidemia?
 tdat$active.kinf <- ifelse(tdat$inf.kid>0,1,0)
@@ -84,5 +85,46 @@ km_fit <- survfit(Surv(stop, status) ~ 1, data=surv.dat)
 ggsurvplot(km_fit, data = surv.dat, ggtheme = theme_bw(), risk.table = TRUE,xlab='Time (years)',conf.int = FALSE)
 
 #---------------------------------------------------------
+# need to know proportion of infected pregnant that are IP, IP2 and JP respectively
 
+#flag kidding of an infected doe with a 1
+dat <- dat %>% group_by(iter) %>% mutate(ip.track=ave(IP, FUN=function(x) c(0, diff(x))))
+dat$ipKids<-NA
+dat$ipKids[dat$ip.track == -1 & dat$kevent == 1] <- 1
+
+#flag kidding of an infected class2 doe with a 1
+dat <- dat %>% group_by(iter) %>% mutate(ip2.track=ave(IP2, FUN=function(x) c(0, diff(x))))
+dat$ip2Kids<-NA
+dat$ip2Kids[dat$ip2.track == -1 & dat$kevent == 1] <- 1
+
+#flag kidding of an persistently infected doe with a 1
+dat <- dat %>% group_by(iter) %>% mutate(jp.track=ave(JP, FUN=function(x) c(0, diff(x))))
+dat$jpKids<-NA
+dat$jpKids[dat$jp.track == -1 & dat$kevent == 1] <- 1
+
+tot.ipkid <- sum(dat$ipKids, na.rm = T)
+tot.ip2kid <- sum(dat$ip2Kids, na.rm = T)
+tot.jpkid <- sum(dat$jpKids, na.rm = T)
+tot.infkid <- sum(tot.ipkid, tot.ip2kid, tot.jpkid)
+
+ip.prop <- tot.ipkid/tot.infkid
+ip2.prop <- tot.ip2kid/tot.infkid
+jp.prop <- tot.jpkid/tot.infkid
+
+
+df <- data.frame(
+  group = c("IP", "IP2", "JP"),
+  value = c(ip.prop, ip2.prop, jp.prop)
+)
+
+loc.lab <- df$value/2 + cumsum(df$value)[1:nrow(df)]
+lab <- round(df$value,2)
+
+# png('distShedComp.png')
+ggplot(df, aes(x="", y=value, fill=group))+
+  geom_bar(width = 1, stat = "identity")+
+  xlab('')+
+  geom_text(aes(y = value/2 + c(0, cumsum(value)[-length(value)]), 
+                label = percent(value)), size=5)
+  
 #

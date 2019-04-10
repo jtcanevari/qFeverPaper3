@@ -309,7 +309,7 @@ double modulus(int a, int b, int c)
 double tp = 253; //day of parturition
 double Tg = 150; //gestation period
 double tc = tp - Tg; //day conception
-double Tl = tp - 3*7; //from here on if infected goes to IP2
+double Tl = tp - 4*7; //from here on if infected goes to IP2
 double ta = tp - 25; //average day of abortion
 /// --------------------------------------------------------------------------
 
@@ -521,8 +521,8 @@ Rcpp::List CaneGillespie(double t_start, double t_end, std::vector<double> n_ini
         case 8: SP--; SNP++; K++; break;
         case 9: IP--; RNP++; K++; KI++; E += epsilon_p; break;
         case 10: IP--; JNP++; K++; KI++; E += epsilon_p; break;
-        case 11: IP2--; RNP++; K++; KI++; E += epsilon_p; break;
-        case 12: IP2--; JNP++; K++; KI++; E += epsilon_p; break;
+        case 11: IP2--; RNP++; K++; break;
+        case 12: IP2--; JNP++; K++; break;
         case 13: JP--; RNP++; K++; KI++; E += epsilon_p; break;
         case 14: RP--; RNP++; K++; break;
         case 15: SNP--; Y++; break;
